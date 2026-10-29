@@ -6,10 +6,13 @@
 
 | | |
 |---|---|
-| Machine | Lenovo IdeaPad 3 15ALC6 (AMD Ryzen) |
-| OS | Ubuntu (Linux) |
-| Compiler / flags | `cc` (GCC), `-O3 -march=native -std=c11` |
-| Method | 200 warm-up runs; median of 5,001 runs (ticks) or 201 batched samples (time); single core |
+| Machine | Lenovo IdeaPad 3 15ALC6 |
+| CPU | AMD Ryzen 5 5500U with Radeon Graphics |
+| OS | Ubuntu 22.04 (Linux) |
+| Compiler / flags | GCC 11.4.0, `-O3 -march=native -std=c11` |
+| CPU governor | `schedutil` (default dynamic frequency scaling, turbo not disabled) |
+| Power | <AC power or battery> |
+| Method | 200 warm-up runs; median of 5,001 runs (ticks) or 201 batched samples (time); single-threaded |
 
 
 
