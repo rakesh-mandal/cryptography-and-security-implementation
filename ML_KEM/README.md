@@ -1,6 +1,6 @@
 ## Benchmark results
 
-Baseline for the portable, unoptimized implementation, which follows the spec pseudocode literally.
+
 
 ### Setup
 
@@ -11,7 +11,7 @@ Baseline for the portable, unoptimized implementation, which follows the spec ps
 | Compiler / flags | `cc` (GCC), `-O3 -march=native -std=c11` |
 | Method | 200 warm-up runs; median of 5,001 runs (ticks) or 201 batched samples (time); single core |
 
-> Fill in the exact CPU model, GCC version, power mode and governor before publishing (`lscpu`, `gcc --version`).
+
 
 ### KEM operations: wall-clock time
 
