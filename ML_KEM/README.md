@@ -45,3 +45,14 @@
 | `poly_compress` (d = 10) | 168 | 0.06 µs |
 | `H` = SHA3-256 of 1184 bytes | 16,212 | 7.77 µs |
 | `G` = SHA3-512 of 64 bytes | 1,953 | 0.92 µs |
+
+
+### Terminal output
+
+`make bench` (TSC ticks):
+
+![make bench output](images/bench_ticks.png)
+
+`make bench_time` (wall-clock time):
+
+![make bench_time output](images/bench_time.png)
