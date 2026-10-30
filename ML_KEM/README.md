@@ -46,7 +46,19 @@
 | `H` = SHA3-256 of 1184 bytes | 16,212 | 7.77 µs |
 | `G` = SHA3-512 of 64 bytes | 1,953 | 0.92 µs |
 
+## Building and running
 
+Requirements: a C11 compiler and `make` (on Debian/Ubuntu: `sudo apt install build-essential`).
+
+```bash
+make test         # build and run the correctness tests (expect "all passed")
+make demo         # build and run a minimal ML-KEM-768 example
+make bench        # TSC-tick benchmark
+make bench_time   # wall-clock benchmark
+make clean        # remove built binaries
+```
+
+The test and benchmark binaries are written to `/tmp`; `demo` is written to the project folder.
 ### Terminal output
 
 `make bench` (TSC ticks):
