@@ -67,3 +67,10 @@ make clean        # remove built binaries
 `make bench_time` (wall-clock time):
 
 ![make bench_time output](images/bench_time.png)
+
+## References
+
+1. NIST FIPS 203, Module-Lattice-Based Key-Encapsulation Mechanism Standard.
+   https://csrc.nist.gov/pubs/fips/203/final
+2. Claude (AI assistant), Anthropic. Used to write the initial C implementation and test suite.
+   https://www.anthropic.com/claude
