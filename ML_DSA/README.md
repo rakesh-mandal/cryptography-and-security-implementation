@@ -100,7 +100,9 @@ Timings vary between runs and machines.
 
 
 ![make bench_time output](images/bench.png)
-## Reference
+## References
 
-NIST FIPS 204, *Module-Lattice-Based Digital Signature Standard* (August 2024).
-Claude
+1. NIST FIPS 204, *Module-Lattice-Based Digital Signature Standard* (August 2024).
+   https://csrc.nist.gov/pubs/fips/204/final
+2. Claude (AI assistant), Anthropic. Used to write the initial C implementation and test suite.
+   https://www.anthropic.com/claude
