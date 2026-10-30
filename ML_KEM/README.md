@@ -58,7 +58,6 @@ make bench_time   # wall-clock benchmark
 make clean        # remove built binaries
 ```
 
-The test and benchmark binaries are written to `/tmp`; `demo` is written to the project folder.
 ### Terminal output
 
 `make bench` (TSC ticks):
