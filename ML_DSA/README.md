@@ -93,7 +93,13 @@ Timings vary between runs and machines.
 | ML-DSA-65 | 1952 | 4032 | 3309 | 3 |
 | ML-DSA-87 | 2592 | 4896 | 4627 | 5 |
 
+### Terminal output
 
+![make bench output](images/test.png)
+
+
+
+![make bench_time output](images/bench.png)
 ## Reference
 
 NIST FIPS 204, *Module-Lattice-Based Digital Signature Standard* (August 2024).
