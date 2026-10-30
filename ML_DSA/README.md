@@ -1,79 +1,100 @@
-/*
- * ML-DSA (FIPS 204) - Module-Lattice-Based Digital Signature Algorithm.
- * Supports ML-DSA-44, ML-DSA-65 and ML-DSA-87 selected at run time.
-*/
-#ifndef MLDSA_H
-#define MLDSA_H
-#include <stddef.h>
-#include <stdint.h>
+# ML-DSA in C (NIST FIPS 204)
 
-#define MLDSA_44 44
-#define MLDSA_65 65
-#define MLDSA_87 87
+A readable, spec-following C99/GNU99 implementation of **ML-DSA** (the Module-Lattice-Based Digital Signature Algorithm, formerly CRYSTALS-Dilithium), supporting **ML-DSA-44, ML-DSA-65 and ML-DSA-87**, selected at run time.
 
-#define MLDSA44_PK_BYTES   1312
-#define MLDSA44_SK_BYTES   2560
-#define MLDSA44_SIG_BYTES  2420
-#define MLDSA65_PK_BYTES   1952
-#define MLDSA65_SK_BYTES   4032
-#define MLDSA65_SIG_BYTES  3309
-#define MLDSA87_PK_BYTES   2592
-#define MLDSA87_SK_BYTES   4896
-#define MLDSA87_SIG_BYTES  4627
 
-#define MLDSA_MAX_PK_BYTES   MLDSA87_PK_BYTES
-#define MLDSA_MAX_SK_BYTES   MLDSA87_SK_BYTES
-#define MLDSA_MAX_SIG_BYTES  MLDSA87_SIG_BYTES
 
-#define MLDSA_SEED_BYTES 32
-#define MLDSA_RND_BYTES  32
+## What is implemented
 
-#define MLDSA_OK            0
-#define MLDSA_ERR_PARAM    (-1)  /* bad level / null pointer / ctx too long */
-#define MLDSA_ERR_RNG      (-2)
-#define MLDSA_ERR_MEM      (-3)
-#define MLDSA_ERR_SIGN     (-4)  /* rejection-loop exhausted (practically unreachable) */
-#define MLDSA_ERR_VERIFY   (-5)  /* signature invalid */
+| Feature | Status |
+|---|---|
+| KeyGen / Sign / Verify with context string (FIPS 204 Alg. 1-3) | Yes |
+| `KeyGen_internal` / `Sign_internal` / `Verify_internal` (Alg. 6-8) | Yes |
+| Hedged and deterministic signing | Yes |
+| ML-DSA-44, -65, -87 | Yes |
+| HashML-DSA (pre-hash, Alg. 4-5) | No |
+| NIST ACVP vector tests | No |
 
-size_t mldsa_pk_bytes(int level);   /* 0 on bad level */
-size_t mldsa_sk_bytes(int level);
-size_t mldsa_sig_bytes(int level);
+## Files
 
-/* Supply your own CSPRNG by replacing this (default: /dev/urandom, see randombytes.c). */
-int mldsa_randombytes(uint8_t *out, size_t len);
+| File | Purpose |
+|---|---|
+| `mldsa.h` | Public API, size macros, error codes |
+| `mldsa.c` | ML-DSA implementation (NTT, rounding, sampling, packing, keygen, sign, verify) |
+| `mldsa_zetas.h` | NTT table: `1753^brv8(i) mod q` (FIPS 204 Appendix B) |
+| `fips202.h`, `fips202.c` | SHAKE128 / SHAKE256 (Keccak-f[1600]) |
+| `randombytes.c` | OS randomness (`/dev/urandom`, or BCrypt on Windows) |
+| `test_mldsa.c` | Test suite |
+| `bench.c` | Benchmark |
+| `Makefile` | Build targets |
 
-/* ML-DSA.KeyGen: random seed xi. */
-int mldsa_keygen(int level, uint8_t *pk, uint8_t *sk);
-/* ML-DSA.KeyGen_internal: deterministic from 32-byte seed xi. */
-int mldsa_keygen_internal(int level, uint8_t *pk, uint8_t *sk, const uint8_t xi[32]);
 
-/*
- * ML-DSA.Sign (pure, with context string, |ctx| <= 255).
- * rnd: 32 bytes of randomness; pass NULL for the default hedged mode (fresh
- * random bytes), or 32 zero bytes for the deterministic variant.
- * On success *siglen = mldsa_sig_bytes(level).
- */
-int mldsa_sign(int level, uint8_t *sig, size_t *siglen,
-               const uint8_t *m, size_t mlen,
-               const uint8_t *ctx, size_t ctxlen,
-               const uint8_t *sk, const uint8_t rnd[32]);
+## Command line
 
-/* ML-DSA.Verify (pure). Returns 0 if valid, MLDSA_ERR_VERIFY if invalid. */
-int mldsa_verify(int level, const uint8_t *sig, size_t siglen,
-                 const uint8_t *m, size_t mlen,
-                 const uint8_t *ctx, size_t ctxlen,
-                 const uint8_t *pk);
+Requires a C compiler and `make`.
 
-/*
- * Internal interfaces operate on M' = pre || msg (the two parts are simply
- * concatenated; pass pre=NULL,prelen=0 to supply a complete M').
- */
-int mldsa_sign_internal(int level, uint8_t *sig, size_t *siglen,
-                        const uint8_t *pre, size_t prelen,
-                        const uint8_t *msg, size_t msglen,
-                        const uint8_t *sk, const uint8_t rnd[32]);
-int mldsa_verify_internal(int level, const uint8_t *sig, size_t siglen,
-                          const uint8_t *pre, size_t prelen,
-                          const uint8_t *msg, size_t msglen,
-                          const uint8_t *pk);
-#endif
+```bash
+cd ML_DSA            # folder containing the files
+
+make test            # build and run the test suite
+make sanitize        # same tests with AddressSanitizer + UBSan
+make bench           # build and run the benchmark
+make clean           # remove binaries
+```
+
+Without `make`:
+
+```bash
+gcc -O3 mldsa.c fips202.c randombytes.c test_mldsa.c -o test_mldsa && ./test_mldsa
+gcc -O3 mldsa.c fips202.c randombytes.c bench.c -o bench && ./bench
+```
+
+
+## Results
+
+### Test suite (`make test`)
+
+Run on Ubuntu (IdeaPad 3 15ALC6). Fixed seed, deterministic signing, so the digests below are reproducible on any correct build.
+
+```
+ML-DSA-44  pk=1312 sk=2560 sig=2420
+  pk   len=1312  shake256[0..16]=329a07b1fabb48f52a309f11a1898f84
+  sk   len=2560  shake256[0..16]=eaa4bd0a7064e1aef9623bfa4c0209a9
+  sig  len=2420  shake256[0..16]=65e0535fce8cdc9a96c0222b11792340
+ML-DSA-65  pk=1952 sk=4032 sig=3309
+  pk   len=1952  shake256[0..16]=1b0563e3cd3346149c8c9ebcf23b0a4e
+  sk   len=4032  shake256[0..16]=fe87058d582b89a47bb18b7ad9fd2636
+  sig  len=3309  shake256[0..16]=a7b67e4f594cdb13a86c116acda3770a
+ML-DSA-87  pk=2592 sk=4896 sig=4627
+  pk   len=2592  shake256[0..16]=89886750b57c24db3fc012e61ede5975
+  sk   len=4896  shake256[0..16]=c06933a362a7d0da2279a3d70edb9acc
+  sig  len=4627  shake256[0..16]=af00b64d3928ebeb3f6775e5314470ec
+
+ALL TESTS PASSED
+```
+
+### Benchmark (`make bench`)
+
+Single core, `-O3`, plain C (no assembly or AVX2):
+
+| Level | KeyGen | Sign | Verify |
+|---|---|---|---|
+| ML-DSA-44 | 153 us | 481 us | 141 us |
+| ML-DSA-65 | 270 us | 728 us | 235 us |
+| ML-DSA-87 | 411 us | 906 us | 400 us |
+
+Timings vary between runs and machines.
+
+### Sizes (bytes)
+
+| Level | Public key | Secret key | Signature | NIST category |
+|---|---|---|---|---|
+| ML-DSA-44 | 1312 | 2560 | 2420 | 2 |
+| ML-DSA-65 | 1952 | 4032 | 3309 | 3 |
+| ML-DSA-87 | 2592 | 4896 | 4627 | 5 |
+
+
+## Reference
+
+NIST FIPS 204, *Module-Lattice-Based Digital Signature Standard* (August 2024).
+Claude
