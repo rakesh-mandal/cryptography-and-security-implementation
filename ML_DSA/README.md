@@ -1,7 +1,7 @@
 /*
  * ML-DSA (FIPS 204) - Module-Lattice-Based Digital Signature Algorithm.
  * Supports ML-DSA-44, ML-DSA-65 and ML-DSA-87 selected at run time.
- */
+*/
 #ifndef MLDSA_H
 #define MLDSA_H
 #include <stddef.h>
